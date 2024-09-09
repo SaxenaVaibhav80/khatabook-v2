@@ -209,3 +209,18 @@ app.listen(3000, () => {
 
 // Unique Session IDs: Server should generate strong, unpredictable session IDs to make it difficult for attackers to guess.
 // Session Expiry: Implementing proper session expiration policies ensures that even if a session ID is compromised, its usefulness is limited.
+
+
+// ------------------------------------session termination------------------>
+
+
+// Tab close karne par session ko automatically delete nahi kiya ja sakta. Tab close karne ka action client-side hai aur server-side session management ko directly affect nahi karta. Jab tak aap server-side par session ko explicitly destroy nahi karenge, session active rahega.
+
+// Database me session data ko store karna sessions ko server restart ya crash ke bawajood persist rakhta hai. In-memory sessions typically get lost if the server restarts.
+
+
+// --------------------------- cookie:{secure:false} ----------------------------------->
+
+// secure: false
+// Definition: The secure option determines whether the session cookie should only be sent over HTTPS (i.e., secure connections).
+// secure: false: This means that the cookie can be sent over both HTTP and HTTPS connections. It is not restricted to secure (HTTPS)    connections only.
