@@ -4,18 +4,23 @@ const db= require("./config/config")
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const userModel = require('./models/users');
+const { connect } = require('mongoose');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-app.use(session({
+app.use(session
+({
     secret: 'your-secret-key', 
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } 
-}));
+    cookie: { secure: false }
+})
+
+);
+
 
 app.get('/signup', (req, res) => {
     res.render('signup');
@@ -37,6 +42,7 @@ app.post('/signup', async (req, res) => {
 
 app.get('/', (req, res) => {
     const go = req.session.isLoggedIn ? 1 : 0;
+    console.log(req.session.id)
     res.render('index', { go });
 });
 
@@ -48,6 +54,7 @@ app.post('/login', async (req, res) => {
 
     if (user && password === user.Password) {
         req.session.isLoggedIn = true; 
+        console.log(req.session.id)
         res.redirect('/');
     } else {
         console.log('Invalid login credentials');
@@ -60,8 +67,9 @@ app.get('/logout', (req, res) => {
         if (err) {
             console.log('Error during logout:', err);
         }
-        res.redirect('/');
     });
+    
+    res.redirect("/")
 });
 
 const ensureLoggedIn = (req, res, next) => {
@@ -128,8 +136,35 @@ app.listen(3000, () => {
 // Session Expires: If the user is inactive for too long or closes the browser, the session expires, and the session data is lost.
 // User Re-logs In: The user must log in again, at which point a new session is created and stored in memory.
 
+// Agar session data server ki memory pe se  delete ho gaya hai aur user next request bhejta hai, to server ke paas session data nahi hoga. Is situation mein:
+
+// Session ID Cookie: User ke browser ke paas session ID cookie to rahegi, lekin server ko session data nahi mil raha hoga.
+
+// Route Access: Jab user request bhejega, server ko session ID cookie milegi. Lekin server ko session data nahi milega, isliye server route access nahi dega, ya phir user ko login page ya error page pe redirect kar sakta hai.
+
 //--------------------------------- COOKIE------------------------------------------->
 
 // What is a Cookie?
 // Definition: A cookie is a small text file that a server sends to a user's web browser. The browser stores this file and sends it back to the server with each subsequent request.
 // Purpose: Cookies are used to store information about the user's session, preferences, or other stateful information that helps websites remember users across different pages or visits.
+
+// --------------------------------About session data storage---------------------
+
+// if you haven't specified a storage mechanism in your express-session configuration, the session data will be stored in memory by default.
+
+// Default Memory Storage:
+// MemoryStore: The express-session middleware uses a built-in memory store called MemoryStore when no other store is provided. This is an in-memory store, which means that session data is stored in the server's memory (RAM).
+
+
+
+// SERVER SESSION DATA---->
+
+// Session Data Storage:
+// The session data (which can include user information, authentication status, and other relevant data) is stored on the server. This can be in memory
+
+// SERVER SESSION ID--->
+// The session ID is stored on the client-side in a cookie. This cookie is sent with each request to the server, allowing the server to retrieve the associated session data using that ID.
+
+// NOTE----------------------->
+
+// we can not retriev the session id from the coookie , we just see it easily using developer tool i application section , to access session id from  the session stored in MemoryStore we use (req.session.id)
