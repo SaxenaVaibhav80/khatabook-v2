@@ -168,3 +168,29 @@ app.listen(3000, () => {
 // NOTE----------------------->
 
 // we can not retriev the session id from the coookie , we just see it easily using developer tool i application section , to access session id from  the session stored in MemoryStore we use (req.session.id)
+
+
+// ------------------------- NOTE----------------------->
+
+// Yes, after setting req.session.isLoggedIn = true;, a session ID will be generated and stored in a cookie on the client-side. Here's a brief overview of the process:
+
+// req.session.isLoggedIn ke likhne pr v session id create hogi mgr cookie me save ni hogi, cookie me tb save hogi jb req.session.isLoggedIn = true kar de
+
+// -----------------------------why we use secret key------------------------------------->
+
+// Detailed Steps for Session Hijacking:
+
+// Session ID Guessing:
+// Obtain Session ID: Attacker ko kisi user ki valid session ID (123) mil jati hai. Yeh session ID ya to guess karke milti hai ya kisi tareeke se leak hoti hai.
+
+// Cookie Tampering:
+// Modify Cookie: Attacker apne browser mein session ID ko modify karta hai aur valid session ID (123) ko apni cookie mein set karta hai.
+
+// Sending Requests:
+// Send Requests: Attacker apni modified cookie ke saath requests bhejta hai. Is request mein cookie ki session ID 123 hoti hai.
+// Server Validation:
+
+// Check Validity: Server is session ID (123) ko validate karta hai aur agar 123 valid session ID hai, to server request ko process karta hai.
+
+// Access Unauthorized Data:
+// Unauthorized Access: Attacker ab valid session ID (123) ke through us user ke data ya functionalities ko access kar sakta hai, jo us user ke liye reserved hain.
