@@ -9,12 +9,12 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Session configuration
+
 app.use(session({
-    secret: 'your-secret-key', // Replace with a strong secret key
+    secret: 'your-secret-key', 
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set secure: true if using HTTPS
+    cookie: { secure: false } 
 }));
 
 app.get('/signup', (req, res) => {
@@ -36,7 +36,6 @@ app.post('/signup', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    // Pass the logged-in status to the view
     const go = req.session.isLoggedIn ? 1 : 0;
     res.render('index', { go });
 });
@@ -48,7 +47,7 @@ app.post('/login', async (req, res) => {
     const user = await userModel.findOne({ Email: email });
 
     if (user && password === user.Password) {
-        req.session.isLoggedIn = true; // Set login state in session
+        req.session.isLoggedIn = true; 
         res.redirect('/');
     } else {
         console.log('Invalid login credentials');
@@ -65,7 +64,6 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// Middleware for protected routes
 const ensureLoggedIn = (req, res, next) => {
     if (req.session.isLoggedIn) {
         next();
@@ -75,8 +73,7 @@ const ensureLoggedIn = (req, res, next) => {
     }
 };
 
-app.use('/contact', ensureLoggedIn);
-app.use('/location', ensureLoggedIn);
+app.use(ensureLoggedIn)
 
 app.get('/contact', (req, res) => {
     res.send('Welcome to the contact page');
