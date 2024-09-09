@@ -194,3 +194,18 @@ app.listen(3000, () => {
 
 // Access Unauthorized Data:
 // Unauthorized Access: Attacker ab valid session ID (123) ke through us user ke data ya functionalities ko access kar sakta hai, jo us user ke liye reserved hain.
+
+// Bilkul, agar real user logout kar deta hai to session expire ho jayega, aur attacker ke liye unauthorized access ka potential kam ho jayega.
+
+// -------------------------------what if session crecret key also got to know by attacker----------------->
+// Session ID Guessing:
+
+// Easy Access: Agar attacker ko valid session ID mil jati hai, wo unauthorized access hasil kar sakta hai, chahe secret key ka use ho ya nahi. Valid session ID ka hona hi attack vector hai.
+// Secret Key Exposure:
+
+// Guessing Secret Key: Agar attacker ko secret key mil jati hai, to wo encrypted data ko decrypt kar sakta hai aur additional attacks perform kar sakta hai. Secret key ko guess karna ya obtain karna mushkil hota hai, lekin agar security practices weak hain, to risk badh jata hai.
+// Securing Sessions
+// Robust Session Management:
+
+// Unique Session IDs: Server should generate strong, unpredictable session IDs to make it difficult for attackers to guess.
+// Session Expiry: Implementing proper session expiration policies ensures that even if a session ID is compromised, its usefulness is limited.
