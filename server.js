@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs")
 const db= require("./config/config")
 const bodyParser = require('body-parser');
 const userModel = require('./models/users');
+const khataModel= require("./models/khaata")
 app.set('view engine', 'ejs');
 const jwt= require("jsonwebtoken");
 const cookieParser = require('cookie-parser');
@@ -11,8 +12,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(cookieParser())
-var loggedin=0
-var loggedout=1
+
 
 const  auth =(req,res,next)=>
 {
@@ -54,15 +54,23 @@ app.post('/signup', async (req, res) => {
     }
     else{
         const encryptPass= await bcrypt.hash(password,10)
-        await userModel.create({
+        const user=await userModel.create({
             Fname:fname,
             Lname:lname,
             Email: email,
             Password:encryptPass
         });
        
+        const id=user._id
+
+        await khataModel.create({
+            userid:id,
+            khata:[]
+        });
+
+        res.redirect('/');
     }
-    res.redirect('/');
+    
 });
 
 
@@ -74,7 +82,11 @@ const checkLoginState = (req, res, next) => {
             jwt.verify(token, '3600103vaibhav');
             loggedIn = true;
         } catch (err) {
-            res.status(400).send("JWT TOKEN MALFORMED")
+            if (err.name === 'TokenExpiredError') {
+                res.redirect("/logout")
+            } else {
+                res.status(401).send("malformed token")
+            }
         }
     }
     res.locals.loggedIn = loggedIn; // Set the loggedIn state in res.locals
@@ -82,6 +94,7 @@ const checkLoginState = (req, res, next) => {
 };
 
 app.get('/', checkLoginState,(req, res) => {
+
     res.render('index');
 });
 
@@ -93,11 +106,8 @@ app.post('/login', async (req, res) => {
         res.status(400).send("please provide all information")
     }
     const user = await userModel.findOne({Email:email });
-    const match =await bcrypt.compare(password,user.Password)
-    if((user)&& match )
+    if((user)&& await bcrypt.compare(password,user.Password) )
     {
-        loggedin=1
-        loggedout=0
         const token = await jwt.sign(
             {id:user._id},
             '3600103vaibhav',  // have to use process.env.key(whatever u want to provide) its basically secure and industry standard4
@@ -124,15 +134,57 @@ app.get('/logout', (req, res) => {
 
     // Clear the token cookie
     res.cookie('token', '', { expires: new Date(0), httpOnly: true });
-    loggedout=1
     res.redirect("/")
 
 });
+app.get("/ADDkhata",auth,async(req,res)=>
+{
+    const data = req.body.data;
+    const kname = req.body.khataname;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // Adding 1 to get the correct month number
+    const day = now.getDate();
+    const date = `${day}-${month}-${year}`;
+    const tokenFromCookie = req.cookies.token;
+    const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+    const id = verification.id;
+    const khatauser = await khataModel.findOne({
+        $and: [{ userid: id }, { 'khata.date': date }]
+    });
+    if(khatauser)
+    {
+        res.status(401).send("khata already avilable")
+    }
+    res.render("addkhata")
+})
+app.post('/ADDKhata', auth, async (req, res) => {
+    const data = req.body.data;
+    const kname = req.body.khataname;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // Adding 1 to get the correct month number
+    const day = now.getDate();
+    const date = `${day}-${month}-${year}`;
+    const tokenFromCookie = req.cookies.token;
+    const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+    const id = verification.id;
 
-app.get('/Khata',auth, (req, res) => {
-    res.send('Welcome to the contact page');
+    await khataModel.updateOne(
+        { userid: id },
+        {
+            $push: {
+                khata: { date: date, data: data, khataname: kname }
+            }
+        }
+    );
+    res.redirect("/");
 });
 
+app.get("/viewkhata:date",(req,res)=>
+{
+  
+})
 app.get('/location', auth,(req, res) => {
     res.send('Welcome to our location');
 });
