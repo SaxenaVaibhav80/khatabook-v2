@@ -191,7 +191,6 @@ app.post('/ADDKhata',auth, async (req, res) => {
     const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
     const id = verification.id;
     const isEncrypted= req.body.enc
-    console.log(isEncrypted)
     if(isEncrypted){
         await khataModel.updateOne(
             { userid: id },
@@ -254,7 +253,7 @@ app.get("/editkhata/:date",auth,async(req,res)=>
             },
             { 'khata.$': 1 } 
         );
-        res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,isEncrpted:user.khata[0].isEncripted})
+        res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,isEncrypted:user.khata[0].isEncrypted})
        } 
 })
 app.get("/deletekhata/:date",auth,async(req,res)=>
@@ -278,7 +277,7 @@ app.get("/deletekhata/:date",auth,async(req,res)=>
     res.redirect("/")
 })
 
-app.get("/updatekhata/:date",auth,async(req,res)=>
+app.post("/updatekhata/:date",auth,async(req,res)=>
     {
        const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
@@ -289,8 +288,29 @@ app.get("/updatekhata/:date",auth,async(req,res)=>
         const data= req.body.data
         const title = req.body.title
         const isEncrypted=req.body.enc
+        let val=false
 
-       
+        if(isEncrypted)
+        {
+            val=true
+        }
+        else{
+            val=false
+        }
+        const user= await khataModel.findOne({userid:id,khata:{ $elemMatch: { date: date } }},{ 'khata.$': 1 })
+
+        await khataModel.updateOne(
+            {userid:id,'khata.date':date},
+
+            {
+                $set: {
+                    "khata.$.data": data,
+                    "khata.$.khataname": title, 
+                    "khata.$.isEncrypted": val
+                }
+            },
+            {new:true}
+        )
 
        }
     res.redirect("/")

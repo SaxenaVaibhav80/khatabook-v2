@@ -13,8 +13,11 @@
     <textarea name="title"><%= title %></textarea>
     <textarea class="editkhataarea" name="data"><%= data %></textarea>
     <label class="editenc">Encryption</label>
-    <input type="checkbox" name="enc" <%= pass ? 'checked' : '' %>>
-    <textarea><%= pass %></textarea>
+    <%if(isEncrypted){%>
+    <input type="checkbox" name="enc" checked>
+    <%}else{%>
+    <input type="checkbox" name="enc">
+   <% } %>
     <button class="update" type="submit">Update</button>
 </form>
 </body>
