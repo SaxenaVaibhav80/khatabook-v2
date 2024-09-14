@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/khata.css">
+    <title>view khata</title>
+</head>
+<body>
+    <h1>your khata is served</h1>
+    <a href="/editkhata/<%= date %>"><h2>edit</h2></a>
+    <a href="/deletekhata/<%= date %>"><h2>delete</h2></a>
+    <h3><%= title %></h3>
+    <h4><%= data %></h4>
+    <h3><%= date %></h3>
+    <button id="whatsapp-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>">Share on WhatsApp</button>
+    <button id="sms-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>">Share via SMS</button>
+<script src="/js/script.js"></script>
+</body>
+</html>

@@ -1,12 +1,12 @@
-body{
-    background-color: blue;
-}
 
 a{
     margin-left: 20px;
-    color: white;
+}
+.deletebtn{
+    height: 17px;
+    width: 17px;
+}
+.label{
+    margin: 100px 0 0 60px;
 }
 
-a:visited{
-    color: white;
-}

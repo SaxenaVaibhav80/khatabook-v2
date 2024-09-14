@@ -9,7 +9,7 @@ const mongoose=require("mongoose")
         khata: [{
             date: {
                 type: String, // Store the date as a string in the format "DD-MM-YYYY"
-                required: true
+                default: " "
             },
             data: {
                 type: String,
@@ -18,6 +18,11 @@ const mongoose=require("mongoose")
             khataname:
             {
                 type:String
+            },
+            code:
+            {
+                type:String,
+                default:null
             }
         }]
     });

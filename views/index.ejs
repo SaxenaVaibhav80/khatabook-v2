@@ -4,19 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/khata.css">
-    <title>home</title>
+    
+    <title>Home</title>
 </head>
 <body>
     <div>
-        
-        <% if (!loggedIn){ %>
-            <a href="/login">login</a>
-            <a href="/signup">signup</a>
-       <% }else{ %>
-           <a href="/logout">logout</a>
-       <% } %>
-        <a href="/contact">contact</a>
-        <a href="/Addkhata">add fresh khata</a>
+        <% if (!loggedIn) { %>
+            <a href="/login">Login</a>
+            <a href="/signup">Signup</a>
+        <% } else { %>
+            <a href="/logout">Logout</a>
+        <% } %>
+        <a href="/contact">Contact</a>
+        <a href="/Addkhata">Add Fresh Khata</a>
+
+        <% if (loggedIn) { %>
+            <% khata_array.forEach((info) => { %>
+                <div class="label">
+                    <div class="visibility">encrypted</div>
+                    <p class="title">Khata Name: <%= info.khataname %></p>
+                    <p class="date">Date: <%= info.date %></p>
+                    <a href="/viewkhata/<%= info.date %>" class="view">View Khata</a>
+                    <a href="/deletekhata/<%= info.date %>"><img src="/img/delete.png" alt="delete" class="deletebtn"></a>
+                </div>
+            <% }) %>
+        <% } %>
     </div>
 </body>
 </html>

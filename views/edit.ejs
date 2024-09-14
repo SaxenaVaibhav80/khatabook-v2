@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/khata.css">
+    <title>Edit khata</title>
+</head>
+<body>
+    <h1>Edit your khata for <%= date %></h1>
+<form method="post" action="/updatekhata/<%= date %>">
+    <h4><%= date %></h4>
+    <textarea name="title"><%= title %></textarea>
+    <textarea class="editkhataarea" name="data"><%= data %></textarea>
+    <label class="editenc">Encryption</label>
+    <input type="checkbox" name="enc" <%= pass ? 'checked' : '' %>>
+    <textarea><%= pass %></textarea>
+    <button class="update" type="submit">Update</button>
+</form>
+</body>
+</html>

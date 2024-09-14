@@ -17,14 +17,16 @@ app.use(cookieParser())
 const  auth =(req,res,next)=>
 {
     const tokenFromCookie= req.cookies.token
-    if (!tokenFromCookie) {
-        return res.status(401).send("Please log in");
-    }
     try{
         const verification =jwt.verify(tokenFromCookie,'3600103vaibhav')
         next()
     }catch(err){
-        res.status(400).send("JWT TOKEN MALFORMED")
+        if (err.name === 'TokenExpiredError' || !tokenFromCookie) {
+                res.redirect("/")
+            }
+        else {
+            res.status(401).send("malformed token")
+        }
     }
 
 }
@@ -50,7 +52,7 @@ app.post('/signup', async (req, res) => {
     }
     const exist = await userModel.findOne({Email:email})
     if(exist){
-        res.status(402).send("user already exist")
+        res.status(401).send("user already exist")
     }
     else{
         const encryptPass= await bcrypt.hash(password,10)
@@ -83,8 +85,9 @@ const checkLoginState = (req, res, next) => {
             loggedIn = true;
         } catch (err) {
             if (err.name === 'TokenExpiredError') {
-                res.redirect("/logout")
-            } else {
+                 res.redirect("/")
+                } 
+            else {
                 res.status(401).send("malformed token")
             }
         }
@@ -93,9 +96,23 @@ const checkLoginState = (req, res, next) => {
     next(); 
 };
 
-app.get('/', checkLoginState,(req, res) => {
-
-    res.render('index');
+app.get('/',checkLoginState,async(req, res) => {
+    const tokenFromCookie = req.cookies.token;
+    if(tokenFromCookie)
+    {  
+        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav')
+        const id = verification.id;
+        const khatauser = await khataModel.findOne({ userid: id})
+       if(khatauser){
+        res.render('index',{khata_array:khatauser.khata});
+       }else{
+        res.render('index',{khata_array:[]});
+       }
+    }
+    else{
+        res.render('index',{khata_array:[]});
+    }
+    
 });
 
 app.post('/login', async (req, res) => {
@@ -103,7 +120,7 @@ app.post('/login', async (req, res) => {
     const password = req.body.password;
     if(!(email && password))
     {
-        res.status(400).send("please provide all information")
+        res.status(401).send("please provide all information")
     }
     const user = await userModel.findOne({Email:email });
     if((user)&& await bcrypt.compare(password,user.Password) )
@@ -112,18 +129,16 @@ app.post('/login', async (req, res) => {
             {id:user._id},
             '3600103vaibhav',  // have to use process.env.key(whatever u want to provide) its basically secure and industry standard4
             {
-               expiresIn:("2h")
+               expiresIn:("24h")
             }
         );
         const options={
-            expires:new Date(Date.now()+3*24*60*60*1000),
+            expires:new Date(Date.now()+24*60*60*1000),
             httpOnly:true
         };
 
         res.status(200).cookie("token",token,options)
         res.redirect("/")
-
-
     }else{
         res.status(401).send("user not present")
     }
@@ -131,60 +146,166 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-
-    // Clear the token cookie
-    res.cookie('token', '', { expires: new Date(0), httpOnly: true });
+    const token=req.cookies.token
+    res.cookie('token', token, { expires: new Date(0), httpOnly: true });
     res.redirect("/")
 
 });
 app.get("/ADDkhata",auth,async(req,res)=>
 {
-    const data = req.body.data;
-    const kname = req.body.khataname;
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1; // Adding 1 to get the correct month number
     const day = now.getDate();
     const date = `${day}-${month}-${year}`;
-    const tokenFromCookie = req.cookies.token;
-    const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
-    const id = verification.id;
-    const khatauser = await khataModel.findOne({
-        $and: [{ userid: id }, { 'khata.date': date }]
-    });
-    if(khatauser)
-    {
-        res.status(401).send("khata already avilable")
-    }
-    res.render("addkhata")
-})
-app.post('/ADDKhata', auth, async (req, res) => {
-    const data = req.body.data;
-    const kname = req.body.khataname;
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1; // Adding 1 to get the correct month number
-    const day = now.getDate();
-    const date = `${day}-${month}-${year}`;
-    const tokenFromCookie = req.cookies.token;
-    const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
-    const id = verification.id;
-
-    await khataModel.updateOne(
-        { userid: id },
+    
+    try{
+        const tokenFromCookie = req.cookies.token;
+        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const id = verification.id;
+        const khatauser = await khataModel.findOne({
+            $and: [{ userid: id }, { 'khata.date': date }]
+        });
+        if(khatauser)
         {
-            $push: {
-                khata: { date: date, data: data, khataname: kname }
-            }
+            res.status(401).send("khata already avilable")
         }
-    );
+        else{
+            res.render("addkhata")
+        }
+    }catch(err){
+        res.status(400)
+    }
+    
+
+})
+app.post('/ADDKhata',auth, async (req, res) => {
+    const data = req.body.data;
+    const kname = req.body.khataname;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // Adding 1 to get the correct month number
+    const day = now.getDate();
+    const date = `${day}-${month}-${year}`;
+    const tokenFromCookie = req.cookies.token;
+    const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+    const id = verification.id;
+    const isEncrypted= req.body.enc
+    const pass = req.body.passcode
+    if(isEncrypted=='on'&& pass){
+        await khataModel.updateOne(
+            { userid: id },
+            {
+                $push: {
+                    khata: { date: date, data: data, khataname: kname,code:pass}
+                }
+            }
+        );
+    }
+    else if(isEncrypted==undefined){
+        await khataModel.updateOne(
+            { userid: id },
+            {
+                $push: {
+                    khata: { date: date, data: data, khataname: kname }
+                }
+            }
+        );
+    }
+    else
+    {
+        res.status(401).send("please enter pass word !!")
+    }
     res.redirect("/");
 });
 
-app.get("/viewkhata:date",(req,res)=>
+app.get("/viewkhata/:date",auth,async(req,res)=>
 {
-  
+    const tokenFromCookie = req.cookies.token;
+       if(tokenFromCookie)
+       {
+        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const id = verification.id;
+        const date= req.params.date
+        const user = await khataModel.findOne(
+            { 
+                userid: id, 
+                khata: { $elemMatch: { date: date } } // Extract only the matching khata element
+            },
+            { 'khata.$': 1 } 
+        );
+        res.render("viewkhata",{date:user.khata[0].date,title:user.khata[0].khataname,data:user.khata[0].data})
+
+        }
 })
+
+app.get("/editkhata/:date",auth,async(req,res)=>
+{
+    const tokenFromCookie = req.cookies.token;
+       if(tokenFromCookie)
+       {
+        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const id = verification.id;
+        const date= req.params.date
+        const user = await khataModel.findOne(
+            { 
+                userid: id, 
+                khata: { $elemMatch: { date: date } } // Extract only the matching khata element
+            },
+            { 'khata.$': 1 } 
+        );
+        if(user.khata[0].code==null)
+        {   
+            res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,pass:null})
+        }else{
+            res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,pass:user.khata[0].code})
+
+        }
+        
+       } 
+})
+app.get("/deletekhata/:date",auth,async(req,res)=>
+    {
+       const tokenFromCookie = req.cookies.token;
+       if(tokenFromCookie)
+       {
+        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const id = verification.id;
+        const date= req.params.date
+        await khataModel.updateOne(
+         { userid: id },
+         {
+             $pull: {
+                 khata: { date:date }
+             }
+         }
+       );
+
+       }
+    res.redirect("/")
+})
+
+app.get("/updatekhata/:date",auth,async(req,res)=>
+    {
+       const tokenFromCookie = req.cookies.token;
+       if(tokenFromCookie)
+       {
+        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const id = verification.id;
+        const date= req.params.date
+        const data= req.body.data
+        const title = req.body.title
+        const isEncrypted=req.body.enc
+
+       
+
+       }
+    res.redirect("/")
+})
+
+
+   
+
 app.get('/location', auth,(req, res) => {
     res.send('Welcome to our location');
 });
