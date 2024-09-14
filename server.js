@@ -104,7 +104,7 @@ app.get('/',checkLoginState,async(req, res) => {
         const id = verification.id;
         const khatauser = await khataModel.findOne({ userid: id})
        if(khatauser){
-        res.render('index',{khata_array:khatauser.khata});
+        res.render('index',{khata_array:khatauser.khata,isEncrypted:khatauser.isEncrypted});
        }else{
         res.render('index',{khata_array:[]});
        }
@@ -191,13 +191,13 @@ app.post('/ADDKhata',auth, async (req, res) => {
     const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
     const id = verification.id;
     const isEncrypted= req.body.enc
-    const pass = req.body.passcode
-    if(isEncrypted=='on'&& pass){
+    console.log(isEncrypted)
+    if(isEncrypted){
         await khataModel.updateOne(
             { userid: id },
             {
                 $push: {
-                    khata: { date: date, data: data, khataname: kname,code:pass}
+                    khata: { date: date, data: data, khataname: kname,isEncrypted:true}
                 }
             }
         );
@@ -254,14 +254,7 @@ app.get("/editkhata/:date",auth,async(req,res)=>
             },
             { 'khata.$': 1 } 
         );
-        if(user.khata[0].code==null)
-        {   
-            res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,pass:null})
-        }else{
-            res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,pass:user.khata[0].code})
-
-        }
-        
+        res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,isEncrpted:user.khata[0].isEncripted})
        } 
 })
 app.get("/deletekhata/:date",auth,async(req,res)=>

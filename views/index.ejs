@@ -21,7 +21,11 @@
         <% if (loggedIn) { %>
             <% khata_array.forEach((info) => { %>
                 <div class="label">
-                    <div class="visibility">encrypted</div>
+                    <% if (info.isEncrypted) { %>
+                        <div class="encrypted">encrypted</div>
+                    <% } else{%>
+                        <div class="visible">Available</div>
+                    <% }%>
                     <p class="title">Khata Name: <%= info.khataname %></p>
                     <p class="date">Date: <%= info.date %></p>
                     <a href="/viewkhata/<%= info.date %>" class="view">View Khata</a>

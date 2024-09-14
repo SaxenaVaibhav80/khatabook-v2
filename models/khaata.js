@@ -19,10 +19,10 @@ const mongoose=require("mongoose")
             {
                 type:String
             },
-            code:
+            isEncrypted:
             {
-                type:String,
-                default:null
+                type:Boolean,
+                default:false
             }
         }]
     });
