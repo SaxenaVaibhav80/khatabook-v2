@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+require("dotenv").config();
+const key =process.env.SECRET_KEY
 const bcrypt = require("bcryptjs")
 const db= require("./config/config")
 const bodyParser = require('body-parser');
@@ -18,7 +20,7 @@ const  auth =(req,res,next)=>
 {
     const tokenFromCookie= req.cookies.token
     try{
-        const verification =jwt.verify(tokenFromCookie,'3600103vaibhav')
+        const verification =jwt.verify(tokenFromCookie,key)
         next()
     }catch(err){
         if (err.name === 'TokenExpiredError' || !tokenFromCookie) {
@@ -81,7 +83,7 @@ const checkLoginState = (req, res, next) => {
     let loggedIn = false;
     if (token) {
         try {
-            jwt.verify(token, '3600103vaibhav');
+            jwt.verify(token, key);
             loggedIn = true;
         } catch (err) {
             if (err.name === 'TokenExpiredError') {
@@ -100,7 +102,7 @@ app.get('/',checkLoginState,async(req, res) => {
     const tokenFromCookie = req.cookies.token;
     if(tokenFromCookie)
     {  
-        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav')
+        const verification = jwt.verify(tokenFromCookie,key)
         const id = verification.id;
         const khatauser = await khataModel.findOne({ userid: id})
        if(khatauser){
@@ -127,7 +129,7 @@ app.post('/login', async (req, res) => {
     {
         const token = await jwt.sign(
             {id:user._id},
-            '3600103vaibhav',  // have to use process.env.key(whatever u want to provide) its basically secure and industry standard4
+             key,  // have to use process.env.key(whatever u want to provide) its basically secure and industry standard4
             {
                expiresIn:("24h")
             }
@@ -161,7 +163,7 @@ app.get("/ADDkhata",auth,async(req,res)=>
     
     try{
         const tokenFromCookie = req.cookies.token;
-        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
         const khatauser = await khataModel.findOne({
             $and: [{ userid: id }, { 'khata.date': date }]
@@ -188,7 +190,7 @@ app.post('/ADDKhata',auth, async (req, res) => {
     const day = now.getDate();
     const date = `${day}-${month}-${year}`;
     const tokenFromCookie = req.cookies.token;
-    const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+    const verification = jwt.verify(tokenFromCookie, key);
     const id = verification.id;
     const isEncrypted= req.body.enc
     if(isEncrypted){
@@ -223,7 +225,7 @@ app.get("/viewkhata/:date",auth,async(req,res)=>
     const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
-        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
         const date= req.params.date
         const user = await khataModel.findOne(
@@ -243,7 +245,7 @@ app.get("/editkhata/:date",auth,async(req,res)=>
     const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
-        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
         const date= req.params.date
         const user = await khataModel.findOne(
@@ -261,7 +263,7 @@ app.get("/deletekhata/:date",auth,async(req,res)=>
        const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
-        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
         const date= req.params.date
         await khataModel.updateOne(
@@ -282,7 +284,7 @@ app.post("/updatekhata/:date",auth,async(req,res)=>
        const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
-        const verification = jwt.verify(tokenFromCookie, '3600103vaibhav');
+        const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
         const date= req.params.date
         const data= req.body.data
@@ -315,13 +317,6 @@ app.post("/updatekhata/:date",auth,async(req,res)=>
        }
     res.redirect("/")
 })
-
-
-   
-
-app.get('/location', auth,(req, res) => {
-    res.send('Welcome to our location');
-});
 
 
 app.listen(3000, () => {
