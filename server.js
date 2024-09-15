@@ -23,7 +23,11 @@ const  auth =(req,res,next)=>
         const verification =jwt.verify(tokenFromCookie,key)
         next()
     }catch(err){
-        if (err.name === 'TokenExpiredError' || !tokenFromCookie) {
+        if(!tokenFromCookie)
+          {
+            res.redirect("/")
+          }
+        else if (err.name === 'TokenExpiredError' || !tokenFromCookie) {
                 res.redirect("/")
             }
         else {
@@ -129,7 +133,7 @@ app.post('/login', async (req, res) => {
     {
         const token = await jwt.sign(
             {id:user._id},
-             key,  // have to use process.env.key(whatever u want to provide) its basically secure and industry standard4
+             key,     // have to use process.env.key(whatever u want to provide) its basically secure and industry standard
             {
                expiresIn:("24h")
             }
@@ -185,17 +189,14 @@ app.post('/ADDKhata',auth, async (req, res) => {
     const data = req.body.data;
     const kname = req.body.khataname;
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1; // Adding 1 to get the correct month number
-    const day = now.getDate();
-    const date = `${day}-${month}-${year}`;
+    const date = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
     const tokenFromCookie = req.cookies.token;
     const verification = jwt.verify(tokenFromCookie, key);
     const id = verification.id;
     const isEncrypted= req.body.enc
     if(isEncrypted){
         await khataModel.updateOne(
-            { userid: id },
+            { userid: id,'khata.date': { $ne: date } },
             {
                 $push: {
                     khata: { date: date, data: data, khataname: kname,isEncrypted:true}
@@ -235,11 +236,30 @@ app.get("/viewkhata/:date",auth,async(req,res)=>
             },
             { 'khata.$': 1 } 
         );
-        res.render("viewkhata",{date:user.khata[0].date,title:user.khata[0].khataname,data:user.khata[0].data})
-
+        
+             res.render("viewkhata",{date:user.khata[0].date,title:user.khata[0].khataname,data:user.khata[0].data,isEncrypted:user.khata[0].isEncrypted})
         }
 })
-
+app.post("/viewkhata/:date",auth,async(req,res)=>
+{
+    const tokenFromCookie = req.cookies.token;
+       if(tokenFromCookie)
+       {
+        const verification = jwt.verify(tokenFromCookie, key);
+        const id = verification.id;
+        const date= req.params.date
+        const pass= req.body.pass
+        const user= await userModel.findOne({_id:id})
+        const isvalid=await bcrypt.compare(pass,user.Password)
+        if(isvalid)
+        {
+            res.redirect(`/viewkhata/${date}`)
+        }
+        else{
+            res.status(401).send("incorrect password....try again to view khata")
+        }
+        }
+})
 app.get("/editkhata/:date",auth,async(req,res)=>
 {
     const tokenFromCookie = req.cookies.token;

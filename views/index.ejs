@@ -28,8 +28,17 @@
                     <% }%>
                     <p class="title">Khata Name: <%= info.khataname %></p>
                     <p class="date">Date: <%= info.date %></p>
-                    <a href="/viewkhata/<%= info.date %>" class="view">View Khata</a>
-                    <a href="/deletekhata/<%= info.date %>"><img src="/img/delete.png" alt="delete" class="deletebtn"></a>
+                    
+                    <% if(info.isEncrypted) { %>
+                        <form method="post" action="/viewkhata/<%=info.date %>">
+                           <input placeholder="passcode" name="pass" required>
+                           <button type="submit">submit</button>
+                        </form>
+                    <%}else{%>
+                        <a href="/viewkhata/<%= info.date %>" class="view">View Khata</a>
+                        <a href="/deletekhata/<%= info.date %>"><img src="/img/delete.png" alt="delete" class="deletebtn"></a>
+                    <%}%>
+                        
                 </div>
             <% }) %>
         <% } %>
