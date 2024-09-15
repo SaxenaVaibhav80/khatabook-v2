@@ -173,13 +173,9 @@ app.get("/ADDkhata",auth,async(req,res)=>
         const khatauser = await khataModel.findOne({
             $and: [{ userid: id }, { 'khata.date': date }]
         });
-        if(khatauser)
-        {
-            res.status(401).send("khata already avilable")
-        }
-        else{
+
             res.render("addkhata")
-        }
+
     }catch(err){
         res.status(400)
     }
@@ -197,7 +193,7 @@ app.post('/ADDKhata',auth, async (req, res) => {
     const isEncrypted= req.body.enc
     if(isEncrypted){
         await khataModel.updateOne(
-            { userid: id,'khata.date': { $ne: date } },
+            { userid: id},
             {
                 $push: {
                     khata: { date: date, data: data, khataname: kname,isEncrypted:true}
@@ -222,76 +218,70 @@ app.post('/ADDKhata',auth, async (req, res) => {
     res.redirect("/");
 });
 
-app.get("/viewkhata/:date",auth,async(req,res)=>
+app.get("/viewkhata/:id",auth,async(req,res)=>
 {
     const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
         const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
-        const date= req.params.date
+        const khataid= req.params.id
         const user = await khataModel.findOne(
-            { 
-                userid: id, 
-                khata: { $elemMatch: { date: date } } // Extract only the matching khata element
-            },
-            { 'khata.$': 1 } 
-        );
-        
-             res.render("viewkhata",{date:user.khata[0].date,title:user.khata[0].khataname,data:user.khata[0].data,isEncrypted:user.khata[0].isEncrypted})
+            { userid:id, 'khata._id': khataid },  // Match the user and the specific khata element
+            { 'khata.$': 1 }  // Retrieve only the matching khata element
+        );      
+             res.render("viewkhata",{date:user.khata[0].date,title:user.khata[0].khataname,data:user.khata[0].data,isEncrypted:user.khata[0].isEncrypted,id:user.khata[0]._id})
         }
 })
-app.post("/viewkhata/:date",auth,async(req,res)=>
+app.post("/viewkhata/:id",auth,async(req,res)=>
 {
     const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
         const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
-        const date= req.params.date
+        const khataid= req.params.id
         const pass= req.body.pass
         const user= await userModel.findOne({_id:id})
         const isvalid=await bcrypt.compare(pass,user.Password)
         if(isvalid)
         {
-            res.redirect(`/viewkhata/${date}`)
+            res.redirect(`/viewkhata/${khataid}`)
         }
         else{
             res.status(401).send("incorrect password....try again to view khata")
         }
         }
 })
-app.get("/editkhata/:date",auth,async(req,res)=>
+app.get("/editkhata/:id",auth,async(req,res)=>
 {
     const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
         const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
-        const date= req.params.date
+        const khataid= req.params.id
         const user = await khataModel.findOne(
-            { 
-                userid: id, 
-                khata: { $elemMatch: { date: date } } // Extract only the matching khata element
-            },
-            { 'khata.$': 1 } 
+            { userid:id, 'khata._id': khataid },  // Match the user and the specific khata element
+            { 'khata.$': 1 }  // Retrieve only the matching khata element
         );
-        res.render("edit",{data:user.khata[0].data,date:date,title:user.khata[0].khataname,isEncrypted:user.khata[0].isEncrypted})
+        res.render("edit",{data:user.khata[0].data,date:user.khata[0].date,title:user.khata[0].khataname,isEncrypted:user.khata[0].isEncrypted,id:user.khata[0]._id})
        } 
 })
-app.get("/deletekhata/:date",auth,async(req,res)=>
-    {
+app.get("/deletekhata/:id",auth,async(req,res)=>
+    {   
        const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
         const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
         const date= req.params.date
+        const khataid = req.params.id
         await khataModel.updateOne(
          { userid: id },
          {
              $pull: {
-                 khata: { date:date }
+                 khata: {_id:khataid}
              }
          }
        );
@@ -300,14 +290,14 @@ app.get("/deletekhata/:date",auth,async(req,res)=>
     res.redirect("/")
 })
 
-app.post("/updatekhata/:date",auth,async(req,res)=>
+app.post("/updatekhata/:id",auth,async(req,res)=>
     {
        const tokenFromCookie = req.cookies.token;
        if(tokenFromCookie)
        {
         const verification = jwt.verify(tokenFromCookie, key);
         const id = verification.id;
-        const date= req.params.date
+        const khataid= req.params.id
         const data= req.body.data
         const title = req.body.title
         const isEncrypted=req.body.enc
@@ -320,10 +310,10 @@ app.post("/updatekhata/:date",auth,async(req,res)=>
         else{
             val=false
         }
-        const user= await khataModel.findOne({userid:id,khata:{ $elemMatch: { date: date } }},{ 'khata.$': 1 })
+        // const user= await khataModel.findOne({userid:id,'khata._id':id},{ 'khata.$': 1 })
 
         await khataModel.updateOne(
-            {userid:id,'khata.date':date},
+            {userid:id,'khata._id':khataid},
 
             {
                 $set: {
