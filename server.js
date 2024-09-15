@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 require("dotenv").config();
 const key =process.env.SECRET_KEY
+const PORT= process.env.PORT
 const bcrypt = require("bcryptjs")
 const db= require("./config/config")
 const bodyParser = require('body-parser');
@@ -339,7 +340,4 @@ app.post("/updatekhata/:date",auth,async(req,res)=>
 })
 
 
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-});
-
+app.listen(PORT)
