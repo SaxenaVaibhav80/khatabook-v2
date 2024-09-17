@@ -7,12 +7,19 @@
     <title>add khata</title>
 </head>
 <body>
-    <form method="post" action="/ADDkhata">
-        <textarea placeholder="enter khata" name="data"></textarea>
-        <input placeholder="enter title" name="khataname">
-        <label name="enc" value="enc">Encrpyt</label>
-        <input type="checkbox" name="enc" >
-        <button type="submit">add</button>
-    </form>
+    <nav id="navbar-loggedin">
+        <a href="/logout" class="logout-nav-loggedin">Logout</a>
+        <a href="/Addkhata" class="addkhata-nav-loggedin">Add Fresh Khata</a>
+        <a href="/" class="home-nav-loggedin">Home</a>
+    </nav>
+    <div class="postkhata">
+        <form method="post" action="/ADDkhata">
+            <input placeholder="Enter title" name="khataname" class="khatatitle">
+            <textarea placeholder="Enter khata" name="data" class="khatadata"></textarea>
+            <label name="enc" value="enc" class="pvcy">Encrpyt</label>
+            <input type="checkbox" name="enc"  class="check">
+            <button type="submit" class="khatasubbtn">Add</button>
+        </form>
+    </div>
 </body>
 </html>

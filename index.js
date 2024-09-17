@@ -111,8 +111,15 @@ app.get('/',checkLoginState,async(req, res) => {
         const id = verification.id;
         const user = await userModel.findOne({ _id: id})
         const khatauser = await khataModel.findOne({ userid: id})
+        const khata_array=khatauser.khata
+        const len= khata_array.length
+        const dec_sort=[]
+        for (let i=len-1;i>=0;i--) 
+        {
+            dec_sort.push(khata_array[i])
+        }
        if(khatauser){
-        res.render('index',{khata_array:khatauser.khata,isEncrypted:khatauser.isEncrypted,username:user.Fname});
+        res.render('index',{oldToNew_array:khata_array,newToOld_array:dec_sort,isEncrypted:khatauser.isEncrypted,username:user.Fname});
        }else{
         res.render('index',{khata_array:[]});
        }
@@ -123,6 +130,7 @@ app.get('/',checkLoginState,async(req, res) => {
     
 });
 
+
 app.post('/login', async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
@@ -131,7 +139,11 @@ app.post('/login', async (req, res) => {
         res.status(401).send("please provide all information")
     }
     const user = await userModel.findOne({Email:email });
-    if((user)&& await bcrypt.compare(password,user.Password) )
+    if(!user)
+    {
+        res.status(401).send("user not present")
+    }
+    else if((user)&& await bcrypt.compare(password,user.Password) )
     {
         const token = await jwt.sign(
             {id:user._id},
@@ -148,7 +160,7 @@ app.post('/login', async (req, res) => {
         res.status(200).cookie("token",token,options)
         res.redirect("/")
     }else{
-        res.status(401).send("user not present")
+        res.status(401).send("Password incorrect")
     }
     
 });
