@@ -6,11 +6,16 @@
     <link rel="stylesheet" href="/css/khata.css">
     <title>login</title>
 </head>
-<body>
-     <form action="/login" method="post">
-      <input placeholder="email" name="email">
-      <input placeholder="password" name="password">
-      <button type="submit">login</button>
-     </form>
+<body class="login-body">
+    <div class="loginbox">
+         <a href="/"><img class="backarrow" src="/img/back-button.png"></a>
+         <h3 class="loginhead">Login</h3>
+        <form action="/login" method="post" class="login-form">
+            <input placeholder="Email" name="email" class="loginname">
+            <input placeholder="Password" name="password" class="loginpassword" type="password">
+            <button type="submit" class="login-btn">login</button>
+        </form>
+    </div>
+    
 </body>
 </html>

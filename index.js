@@ -109,9 +109,10 @@ app.get('/',checkLoginState,async(req, res) => {
     {  
         const verification = jwt.verify(tokenFromCookie,key)
         const id = verification.id;
+        const user = await userModel.findOne({ _id: id})
         const khatauser = await khataModel.findOne({ userid: id})
        if(khatauser){
-        res.render('index',{khata_array:khatauser.khata,isEncrypted:khatauser.isEncrypted});
+        res.render('index',{khata_array:khatauser.khata,isEncrypted:khatauser.isEncrypted,username:user.Fname});
        }else{
         res.render('index',{khata_array:[]});
        }
