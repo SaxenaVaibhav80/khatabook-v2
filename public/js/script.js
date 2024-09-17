@@ -74,9 +74,3 @@ document.getElementById('sms-share').addEventListener('click', function() {
 // answer-->
 // URL schemes are a way of specifying the protocol used to access a particular resource or service. They determine how an application should interpret the URL and what action to take. URL schemes are a crucial part of both web and native app development.
 
-$(document).ready(function () {
-    $('#sort-options').on('change', function () {
-        const selectedSort = $(this).val(); // Get selected sorting option
-        window.location.href = `/?sort=${selectedSort}`; // Redirect with selected sorting option as query param
-    });
-});

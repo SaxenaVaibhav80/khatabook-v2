@@ -1,6 +1,7 @@
 body{
     margin:0;
     /* font-family: "Dosis", sans-serif; */
+    font-family: "Open Sans", sans-serif;
    
 }
 .nav-login,.nav-signup,.nav-addkhata,.nav-logout{
@@ -380,22 +381,61 @@ body{
 }
 .view-khata-div {
     width: 26%;
-    border: 1px solid black;
+    /* border: 1px solid black; */
     margin: 8% 0 0 35%;
-    min-height: 417px;
+    min-height: 350px;
+    
 }
-.viewdeletebtn,.vieweditbtn{
+.viewdeletebtn,.vieweditbtn,.viewdeletebtn-link,.vieweditbtn-link{
     width: 15px;
     height: 15px;
-
 }
-.edit-del-div{
+
+.edit-del-div {
     display: flex;
     flex-direction: row-reverse;
-    margin-right: 15px;
     margin-top: 10px;
+    width: 11%;
+    margin-left: 69%;
+    justify-content: space-between;
 }
-.title-div{
+.title-div {
     display: flex;
+}
+.view-title {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.view-date {
+    margin: 0;
+    font-size: 0.8rem;
+    margin: 5px 0 0 0 ;
+    color: darkslategrey;
+}
+.view-data{
+    width: 100%;
+    border: 1px solid darkgray;
+    border-radius: 10px;
+    min-height: 200px;
+    padding: 10px 0 0 10px;
+    margin : 15px 0 0 0;
+}
+#whatsapp-share,#sms-share{
+    margin-top: 20px;
+    padding: 9px;
+    border-radius: 3px;
+    border-style: none;
+}
+#sms-share{
+   margin-left: 5px;
+   background-color: rgb(219, 211, 100);
+   color: white;
+   font-weight: 500;
+}
+#whatsapp-share{
+    background-color: rgb(142, 192, 142);
+    color: white;
+    font-weight: 500; 
 }
 
