@@ -104,6 +104,7 @@ const checkLoginState = (req, res, next) => {
 };
 
 app.get('/',checkLoginState,async(req, res) => {
+    // res.redirect("/logout")
     const tokenFromCookie = req.cookies.token;
     if(tokenFromCookie)
     {  
@@ -111,9 +112,9 @@ app.get('/',checkLoginState,async(req, res) => {
         const id = verification.id;
         const user = await userModel.findOne({ _id: id})
         const khatauser = await khataModel.findOne({ userid: id})
+        const dec_sort=[]
         const khata_array=khatauser.khata
         const len= khata_array.length
-        const dec_sort=[]
         for (let i=len-1;i>=0;i--) 
         {
             dec_sort.push(khata_array[i])
