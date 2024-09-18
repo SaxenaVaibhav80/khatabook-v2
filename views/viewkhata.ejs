@@ -13,17 +13,22 @@
         <a href="/" class="home-nav-loggedin">Home</a>
     </nav>
     <div class="view-khata-div">
-        <div class="title-div">
-            <h3 class="view-title"><%= title[0].toUpperCase()+ title.substring(1) %></h3>
+        <h3 class="view-title"><%= title[0].toUpperCase()+ title.substring(1) %></h3>
+        <div class="date-del-edit-div">
+            <h3 class="view-date">Created on <%= date %></h3>
             <div class="edit-del-div">
                 <a href="/deletekhata/<%= id %>"class="viewdeletebtn-link"><img src="/img/delete.png" class="viewdeletebtn"></a>
                 <a href="/editkhata/<%= id %>" class="vieweditbtn-link"><img src="/img/edit.png" class="vieweditbtn"></a>
             </div>
         </div>
-        <h3 class="view-date">Created on <%= date %></h3>
         <div class="view-data"><%= data %></div>
-        <button id="whatsapp-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>">Share on WhatsApp</button>
-        <button id="sms-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>">Share via SMS</button>
+        <!-- <button id="whatsapp-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>">Share on WhatsApp</button>
+        <button id="sms-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>">Share via SMS</button> -->
+
+        <img src="/img/logo.png" id="whatsapp-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>"></img>
+        <img src="/img/new-email.png" id="sms-share" data-title="<%= title %>" data-date="<%= date %>" data-data="'<%=data %>"></img>
+
+
     </div>
 <script src="/js/script.js"></script>
 </body>

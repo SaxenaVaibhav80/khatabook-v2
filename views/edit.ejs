@@ -7,18 +7,23 @@
     <title>Edit khata</title>
 </head>
 <body>
-    <h1>Edit your khata for <%= date %></h1>
-<form method="post" action="/updatekhata/<%= id %>">
-    <h4><%= date %></h4>
-    <textarea name="title"><%= title %></textarea>
-    <textarea class="editkhataarea" name="data"><%= data %></textarea>
-    <label class="editenc">Encryption</label>
-    <%if(isEncrypted){%>
-    <input type="checkbox" name="enc" checked>
-    <%}else{%>
-    <input type="checkbox" name="enc">
-   <% } %>
-    <button class="update" type="submit">Update</button>
-</form>
+    <nav id="navbar-loggedin">
+        <a href="/logout" class="logout-nav-loggedin">Logout</a>
+        <a href="/Addkhata" class="addkhata-nav-loggedin">Add Fresh Khata</a>
+        <a href="/" class="home-nav-loggedin">Home</a>
+    </nav>
+    <form method="post" action="/updatekhata/<%= id %>" class="edit-form">
+        <textarea name="title" class="edit-title"><%= title %></textarea>
+        <h4 class="edit-date"><%= date %></h4>
+        <textarea class="editkhataarea" name="data" ><%= data %></textarea>
+        <label class="editenc">Encryption</label>
+        <%if(isEncrypted){%>
+        <input type="checkbox" name="enc" checked class="edit-check-enc">
+        <%}else{%>
+        <input type="checkbox" name="enc" class="edit-check">
+       <% } %>
+        <button  type="submit" class="edit-update-btn">Update</button>
+    </form>
+
 </body>
 </html>
