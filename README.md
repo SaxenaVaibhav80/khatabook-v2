@@ -58,7 +58,7 @@ Create a `.env` file and add:
 
 ```
 MONGO_URI=your_mongo_connection_string
-JWT_SECRET=your_secret_key
+SECRET_KEY=your_secret_key
 PORT=3000
 ```
 
