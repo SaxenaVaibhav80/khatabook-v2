@@ -38,7 +38,7 @@
 2. **Install dependencies:**
    ```sh
    npm init
-   npm i ejs nodemon --save-dev express mongoose body-parser 
+   npm i ejs nodemon --save-dev express mongoose body-parser bcrypt dotenv
    ```
 3. **Start the server:**
    add something to scripts field in package.json
